@@ -1,0 +1,10 @@
+Признак,Importance,Importance_pct
+person_income_boxcox,5654,30.741626794258377
+loan_int_rate,3107,16.89321444106133
+loan_amnt,2327,12.652240104393215
+loan_percent_income,2162,11.755110917790343
+person_emp_length,1745,9.487820791648543
+loan_intent,1542,8.384080034797737
+person_home_ownership,958,5.208786428882123
+loan_grade,736,4.001739886907351
+cb_person_default_on_file,161,0.875380600260983

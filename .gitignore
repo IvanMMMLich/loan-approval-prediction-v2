@@ -5,10 +5,6 @@ __pycache__/
 venv/
 *.egg-info/
 
-# Data (большие файлы)
-data/raw/
-*.csv
-
 # IDE
 .idea/
 .vscode/
@@ -17,6 +13,3 @@ data/raw/
 # OS
 .DS_Store
 Thumbs.db
-
-# Models (большие файлы)
-*.pkl
