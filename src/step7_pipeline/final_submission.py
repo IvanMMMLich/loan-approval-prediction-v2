@@ -310,29 +310,27 @@ def main():
     print("="*70)
     
     print(f"""
-    ✅ Pipeline обучен на {len(X_full):,} примерах
-    ✅ Предсказания сделаны для {len(X_test):,} примеров
-    ✅ Визуализация сохранена
-    ✅ Submission файлы созданы
+    Pipeline обучен на {len(X_full):,} примерах
+    Предсказания сделаны для {len(X_test):,} примеров
+    Визуализация сохранена
+    Submission файлы созданы
     
-    📊 Train метрики:
+    Train метрики:
        ROC-AUC:  {metrics['ROC-AUC']:.4f}
        Accuracy: {metrics['Accuracy']:.4f}
        Recall:   {metrics['Recall']:.4f}
        F1-Score: {metrics['F1-Score']:.4f}
     
-    📁 Файлы:
+    Файлы:
        • {RESULTS_DIR / 'figures'} (графики)
        • {RESULTS_DIR / 'tables'} (таблицы)
        • {submission_proba_path}
        • {submission_class_path}
        • {model_path}
     
-    📤 Для Kaggle:
-       Загрузите submission_proba.csv (если метрика ROC-AUC)
-       или submission_class.csv (если метрика Accuracy/F1)
+
     
-    🏆 Ожидаемый ROC-AUC на Kaggle: ~0.955-0.960
+    Ожидаемый ROC-AUC на Kaggle: ~0.955-0.960
     """)
 
 

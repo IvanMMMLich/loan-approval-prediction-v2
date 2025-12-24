@@ -278,9 +278,9 @@ def main():
     │  2. CLASSIFIER (LightGBM с лучшими параметрами)         │
     └─────────────────────────────────────────────────────────┘
     
-    ✅ Все трансформации внутри Pipeline
-    ✅ fit() только на train
-    ✅ Нет data leakage!
+    Все трансформации внутри Pipeline
+    fit() только на train
+    Нет data leakage!
     """)
     
     # ========================================================================
@@ -292,7 +292,7 @@ def main():
     
     cv_results = run_cross_validation(X, y, n_splits=5)
     
-    print("\n   📊 РЕЗУЛЬТАТЫ CV:")
+    print("\n   РЕЗУЛЬТАТЫ CV:")
     print(f"   {'Метрика':<15} {'Mean':>10} {'± Std':>10}")
     print(f"   {'-'*35}")
     
@@ -320,7 +320,7 @@ def main():
     
     importance_df, fitted_pipeline = analyze_feature_importance(X, y)
     
-    print("\n   📊 ВАЖНОСТЬ ПРИЗНАКОВ:")
+    print("\n   ВАЖНОСТЬ ПРИЗНАКОВ:")
     print(f"   {'Признак':<25} {'Importance':>12} {'%':>8}")
     print(f"   {'-'*45}")
     
@@ -351,7 +351,7 @@ def main():
         print(f"      • {row['Признак']}: {row['Importance_pct']:.1f}%")
     
     print(f"""
-   💡 РЕШЕНИЕ:
+   РЕШЕНИЕ:
       Оставляем все признаки — LightGBM сам определит веса.
       Удаление слабых признаков редко улучшает бустинг.
     """)
@@ -364,15 +364,15 @@ def main():
     print("="*70)
     
     print(f"""
-    ✅ Pipeline создан БЕЗ data leakage
-    ✅ 5-Fold CV: ROC-AUC = {cv_results['roc_auc']['mean']:.4f} ± {cv_results['roc_auc']['std']:.4f}
-    ✅ Feature Importance проанализирован
+    Pipeline создан БЕЗ data leakage
+    5-Fold CV: ROC-AUC = {cv_results['roc_auc']['mean']:.4f} ± {cv_results['roc_auc']['std']:.4f}
+    Feature Importance проанализирован
     
-    📁 Результаты сохранены в: {RESULTS_DIR}
+    Результаты сохранены в: {RESULTS_DIR}
        • cv_results.csv
        • feature_importance.csv
     
-    ➡️  Следующий шаг: python final_submission.py
+    Следующий шаг: python final_submission.py
     """)
     
     return fitted_pipeline, cv_results, importance_df

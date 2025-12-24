@@ -1,4 +1,4 @@
-person_income,person_home_ownership,person_emp_length,loan_intent,loan_grade,loan_amnt,loan_int_rate,loan_percent_income,cb_person_default_on_file,loan_status
+person_income_boxcox,person_home_ownership,person_emp_length,loan_intent,loan_grade,loan_amnt,loan_int_rate,loan_percent_income,cb_person_default_on_file,loan_status
 -1.098398090943202,RENT,0.0,EDUCATION,B,6000,11.49,0.17,N,0
 -0.042652183083643255,OWN,6.0,MEDICAL,C,4000,13.35,0.07,N,0
 -1.5395198114898025,OWN,8.0,PERSONAL,A,6000,8.9,0.21,N,0

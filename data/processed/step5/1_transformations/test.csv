@@ -1,4 +1,4 @@
-person_income,person_home_ownership,person_emp_length,loan_intent,loan_grade,loan_amnt,loan_int_rate,loan_percent_income,cb_person_default_on_file
+person_income_boxcox,person_home_ownership,person_emp_length,loan_intent,loan_grade,loan_amnt,loan_int_rate,loan_percent_income,cb_person_default_on_file
 0.4228270451350863,RENT,3.0,HOMEIMPROVEMENT,F,25000,15.76,0.36,N
 1.1549108751705055,MORTGAGE,6.0,PERSONAL,C,10000,12.68,0.1,Y
 -1.4470066056143203,RENT,5.0,VENTURE,E,4000,17.19,0.13,Y

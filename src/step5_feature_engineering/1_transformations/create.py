@@ -120,19 +120,22 @@ def main():
     print("3. ЗАМЕНА ПРИЗНАКА")
     print("-"*70)
     
-    # Заменяем person_income на трансформированный
-    train['person_income'] = train_income_transformed.flatten()
-    test['person_income'] = test_income_transformed.flatten()
+    # Удаляем старый person_income и добавляем трансформированный с новым именем
+    train = train.drop(columns=['person_income'])
+    test = test.drop(columns=['person_income'])
     
-    print("\nperson_income заменён на Box-Cox трансформированный")
+    train.insert(0, 'person_income_boxcox', train_income_transformed.flatten())
+    test.insert(0, 'person_income_boxcox', test_income_transformed.flatten())
+    
+    print("\nperson_income → person_income_boxcox (Box-Cox)")
     
     # Проверяем после трансформации
-    print(f"\n[ПОСЛЕ] person_income статистика (train):")
-    print(f"   Min:      {train['person_income'].min():.4f}")
-    print(f"   Max:      {train['person_income'].max():.4f}")
-    print(f"   Mean:     {train['person_income'].mean():.4f}")
-    print(f"   Median:   {train['person_income'].median():.4f}")
-    print(f"   Skewness: {train['person_income'].skew():.4f}")
+    print(f"\n[ПОСЛЕ] person_income_boxcox статистика (train):")
+    print(f"   Min:      {train['person_income_boxcox'].min():.4f}")
+    print(f"   Max:      {train['person_income_boxcox'].max():.4f}")
+    print(f"   Mean:     {train['person_income_boxcox'].mean():.4f}")
+    print(f"   Median:   {train['person_income_boxcox'].median():.4f}")
+    print(f"   Skewness: {train['person_income_boxcox'].skew():.4f}")
     
     # ========================================================================
     # 4. СОХРАНЕНИЕ
@@ -166,7 +169,7 @@ def main():
     
     print(f"\nИзменения:")
     print(f"   • person_income: Box-Cox (λ = {lambda_value:.4f})")
-    print(f"   • Skewness: 10.46 → {train['person_income'].skew():.2f}")
+    print(f"   • Skewness: 10.46 → {train['person_income_boxcox'].skew():.2f}")
     
     print(f"\nФайлы сохранены в: {OUTPUT_DIR}")
     print(f"\nСледующий шаг: python evaluate.py")

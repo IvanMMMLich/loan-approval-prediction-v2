@@ -202,7 +202,7 @@ def main():
     print("-"*70)
     
     # Новые признаки для выделения (в данном случае нет новых, только трансформация)
-    new_features = []  # person_income трансформирован, но не новый столбец
+    new_features = ['person_income_boxcox']  # person_income трансформирован, но не новый столбец
     
     run_full_analysis(
         X_train=X_train,
