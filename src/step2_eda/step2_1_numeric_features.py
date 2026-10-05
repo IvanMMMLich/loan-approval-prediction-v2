@@ -3,7 +3,6 @@ Step 2.1: Анализ числовых признаков
 Полный анализ всех 7 числовых признаков с консолидированными результатами
 """
 
-import sys
 from pathlib import Path
 
 import pandas as pd
@@ -18,7 +17,6 @@ from src.utils.numeric_analysis import (
 )
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
-sys.path.insert(0, str(PROJECT_ROOT))
 
 # ============================================================================
 # НАСТРОЙКИ

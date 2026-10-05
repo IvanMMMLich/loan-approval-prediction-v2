@@ -22,7 +22,6 @@ Step 6: Hyperparameter Tuning — LightGBM + Optuna
 ============================================================================
 """
 
-import sys
 import warnings
 from pathlib import Path
 
@@ -38,9 +37,7 @@ from src.utils.plotting import plot_all_model_visualizations
 warnings.filterwarnings("ignore")
 optuna.logging.set_verbosity(optuna.logging.WARNING)
 
-# Добавляем путь к utils
 PROJECT_ROOT = Path(__file__).parent.parent.parent
-sys.path.append(str(PROJECT_ROOT / "src"))
 
 # ============================================================================
 # НАСТРОЙКИ ПУТЕЙ

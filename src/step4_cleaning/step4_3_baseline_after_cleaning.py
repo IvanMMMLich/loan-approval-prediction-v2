@@ -17,7 +17,6 @@ Step 4.3: Baseline модель после очистки данных
     (временное решение, в step5 сделаем правильное Ordinal/OneHot)
 """
 
-import sys
 from pathlib import Path
 
 import pandas as pd
@@ -36,9 +35,7 @@ from sklearn.preprocessing import LabelEncoder
 
 from src.utils.plotting import plot_all_model_visualizations
 
-# Добавляем путь к utils
 PROJECT_ROOT = Path(__file__).parent.parent.parent
-sys.path.append(str(PROJECT_ROOT / "src"))
 
 # ============================================================================
 # НАСТРОЙКИ

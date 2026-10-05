@@ -3,7 +3,6 @@ Step 2.2: Анализ категориальных признаков
 Полный анализ всех 4 категориальных признаков с консолидированными результатами
 """
 
-import sys
 from pathlib import Path
 
 import pandas as pd
@@ -17,7 +16,6 @@ from src.utils.categorical_analysis import (
 )
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
-sys.path.insert(0, str(PROJECT_ROOT))
 
 # ============================================================================
 # НАСТРОЙКИ

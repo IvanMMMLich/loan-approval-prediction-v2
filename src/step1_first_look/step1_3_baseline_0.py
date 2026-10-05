@@ -22,7 +22,6 @@ Step 1.3: Baseline Model 0 (точка отсчёта)
 """
 
 import os
-import sys
 from pathlib import Path
 
 import pandas as pd
@@ -38,9 +37,6 @@ from src.utils.plotting import plot_all_model_visualizations
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 os.chdir(PROJECT_ROOT)
-
-# Добавляем корень проекта в sys.path чтобы работали импорты
-sys.path.insert(0, str(PROJECT_ROOT))
 
 # =============================================================================
 # АВТООПРЕДЕЛЕНИЕ КОРНЯ ПРОЕКТА

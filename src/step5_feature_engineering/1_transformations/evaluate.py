@@ -15,7 +15,6 @@ Step 5.1: Evaluate — Random Forest Baseline + Метрики + Анализ
 ============================================================================
 """
 
-import sys
 from pathlib import Path
 
 import pandas as pd
@@ -26,9 +25,7 @@ from src.utils.analysis import run_full_analysis
 from src.utils.metrics import calculate_all_metrics, print_metrics, save_metrics
 from src.utils.plotting import plot_all_model_visualizations
 
-# Добавляем путь к utils
 PROJECT_ROOT = Path(__file__).parent.parent.parent.parent
-sys.path.append(str(PROJECT_ROOT / "src"))
 
 # ============================================================================
 # НАСТРОЙКИ ПУТЕЙ

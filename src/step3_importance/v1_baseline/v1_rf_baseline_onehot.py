@@ -26,7 +26,6 @@ BASELINE V1 (ONE-HOT): RANDOM FOREST CLASSIFIER
 - n_jobs=-1
 """
 
-import sys
 from pathlib import Path
 
 import pandas as pd
@@ -44,9 +43,8 @@ from sklearn.model_selection import train_test_split
 
 from src.utils.plotting import plot_all_model_visualizations
 
-# Добавляем корневую директорию проекта в sys.path
+# Корень проекта для путей к данным и результатам
 project_root = Path(__file__).parent.parent.parent.parent
-sys.path.insert(0, str(project_root))
 
 # ============================================================================
 # НАСТРОЙКИ

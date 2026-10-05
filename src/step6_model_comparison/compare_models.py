@@ -21,7 +21,6 @@ Step 6: Model Selection — Сравнение моделей
 ============================================================================
 """
 
-import sys
 import warnings
 from pathlib import Path
 
@@ -36,9 +35,7 @@ from src.utils.metrics import calculate_all_metrics, print_metrics
 
 warnings.filterwarnings("ignore")
 
-# Добавляем путь к utils
 PROJECT_ROOT = Path(__file__).parent.parent.parent
-sys.path.append(str(PROJECT_ROOT / "src"))
 
 # ============================================================================
 # НАСТРОЙКИ ПУТЕЙ

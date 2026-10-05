@@ -29,7 +29,6 @@ BASELINE V1: RANDOM FOREST CLASSIFIER
 - Логика: выше число = лучше клиент = РЕЖЕ одобряют (субстандартный кредитор)
 """
 
-import sys
 from pathlib import Path
 
 import pandas as pd
@@ -49,9 +48,8 @@ from src.utils.plotting import (
     plot_all_model_visualizations,
 )
 
-# Добавляем корневую директорию проекта в sys.path
+# Корень проекта для путей к данным и результатам
 project_root = Path(__file__).parent.parent.parent.parent
-sys.path.insert(0, str(project_root))
 
 # ============================================================================
 # НАСТРОЙКИ

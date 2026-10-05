@@ -15,7 +15,6 @@ Step 10: Final Training + Submission
 """
 
 import pickle
-import sys
 import warnings
 from pathlib import Path
 
@@ -32,9 +31,7 @@ from src.utils.plotting import plot_all_model_visualizations
 
 warnings.filterwarnings("ignore")
 
-# Добавляем путь к utils
 PROJECT_ROOT = Path(__file__).parent.parent.parent
-sys.path.append(str(PROJECT_ROOT / "src"))
 
 # ============================================================================
 # НАСТРОЙКИ ПУТЕЙ

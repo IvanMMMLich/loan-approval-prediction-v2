@@ -21,7 +21,6 @@ Step 7-9: Pipeline + Cross-Validation + Feature Analysis
 ============================================================================
 """
 
-import sys
 import warnings
 from pathlib import Path
 
@@ -34,9 +33,7 @@ from sklearn.preprocessing import OrdinalEncoder, PowerTransformer
 
 warnings.filterwarnings("ignore")
 
-# Добавляем путь к utils
 PROJECT_ROOT = Path(__file__).parent.parent.parent
-sys.path.append(str(PROJECT_ROOT / "src"))
 
 
 # ============================================================================
