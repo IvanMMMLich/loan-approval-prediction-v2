@@ -13,10 +13,11 @@ Step 1.1: Загрузка данных и первичный анализ
 6. Анализируем целевую переменную (дисбаланс классов)
 7. Сохраняем результаты в CSV файлы
 """
-import pandas as pd
-import numpy as np
+
 import os
 from pathlib import Path
+
+import pandas as pd
 
 # =============================================================================
 # АВТООПРЕДЕЛЕНИЕ КОРНЯ ПРОЕКТА
@@ -37,10 +38,10 @@ print(f"Рабочая директория: {os.getcwd()}")
 # =============================================================================
 
 # Путь к исходным данным
-DATA_PATH = 'data/raw/train.csv'
+DATA_PATH = "data/raw/train.csv"
 
 # Путь для сохранения результатов
-RESULTS_PATH = 'results/step1_first_look/tables'
+RESULTS_PATH = "results/step1_first_look/tables"
 
 # Создаём папку для результатов если её нет
 # exist_ok=True означает: не выдавать ошибку если папка уже существует
@@ -50,9 +51,9 @@ os.makedirs(RESULTS_PATH, exist_ok=True)
 # НАЧАЛО АНАЛИЗА
 # =============================================================================
 
-print("="*60)
+print("=" * 60)
 print("STEP 1.1: ЗАГРУЗКА И ПЕРВИЧНЫЙ АНАЛИЗ ДАННЫХ")
-print("="*60)
+print("=" * 60)
 
 # -----------------------------------------------------------------------------
 # 1. ЗАГРУЗКА ДАННЫХ
@@ -70,7 +71,7 @@ print(f" Данные загружены из {DATA_PATH}")
 # 2. РАЗМЕРНОСТЬ ДАННЫХ
 # -----------------------------------------------------------------------------
 
-print(f"\n2. Размерность данных:")
+print("\n2. Размерность данных:")
 
 # df.shape возвращает кортеж (количество_строк, количество_столбцов)
 # :, - форматирование числа с разделителями тысяч (165034 → 165,034)
@@ -84,7 +85,7 @@ print(f"   Столбцов (признаков): {df.shape[1]}")
 # 3. ПРОСМОТР ПЕРВЫХ СТРОК
 # -----------------------------------------------------------------------------
 
-print(f"\n3. Первые 5 строк:")
+print("\n3. Первые 5 строк:")
 
 # df.head() показывает первые N строк (по умолчанию 5)
 # Помогает визуально понять структуру данных
@@ -94,7 +95,7 @@ print(df.head())
 # 4. ИНФОРМАЦИЯ О ТИПАХ ДАННЫХ
 # -----------------------------------------------------------------------------
 
-print(f"\n4. Информация о данных:")
+print("\n4. Информация о данных:")
 
 # df.info() выводит:
 # - Количество строк
@@ -108,7 +109,7 @@ df.info()
 # 5. ПРОВЕРКА ПРОПУСКОВ (MISSING VALUES)
 # -----------------------------------------------------------------------------
 
-print(f"\n5. Пропуски в данных:")
+print("\n5. Пропуски в данных:")
 
 # df.isna() возвращает DataFrame с True/False (True = пропуск)
 # .sum() считает количество True по каждому столбцу
@@ -125,7 +126,7 @@ else:
 # 6. БАЗОВАЯ СТАТИСТИКА ПО ЧИСЛОВЫМ ПРИЗНАКАМ
 # -----------------------------------------------------------------------------
 
-print(f"\n6. Базовая статистика (числовые признаки):")
+print("\n6. Базовая статистика (числовые признаки):")
 
 # df.describe() считает статистику для всех числовых столбцов:
 # - count: количество непустых значений
@@ -140,7 +141,7 @@ stats = df.describe()
 print(stats)
 
 # Сохраняем статистику в CSV файл
-stats_file = os.path.join(RESULTS_PATH, '01_basic_statistics.csv')
+stats_file = os.path.join(RESULTS_PATH, "01_basic_statistics.csv")
 stats.to_csv(stats_file)
 print(f"\n Статистика сохранена: {stats_file}")
 
@@ -148,17 +149,17 @@ print(f"\n Статистика сохранена: {stats_file}")
 # 7. АНАЛИЗ ЦЕЛЕВОЙ ПЕРЕМЕННОЙ (TARGET)
 # -----------------------------------------------------------------------------
 
-print(f"\n7. Целевая переменная (loan_status):")
+print("\n7. Целевая переменная (loan_status):")
 
 # loan_status - целевая переменная (то, что мы предсказываем):
 # 0 = кредит НЕ одобрен (отклонён)
 # 1 = кредит одобрен
 
 # value_counts() считает сколько раз встречается каждое значение
-target_counts = df['loan_status'].value_counts().sort_index()
+target_counts = df["loan_status"].value_counts().sort_index()
 
 # normalize=True преобразует в проценты
-target_pct = df['loan_status'].value_counts(normalize=True).sort_index() * 100
+target_pct = df["loan_status"].value_counts(normalize=True).sort_index() * 100
 
 print(f"\n   Класс 0 (НЕ одобрен): {target_counts[0]:,} ({target_pct[0]:.2f}%)")
 print(f"   Класс 1 (одобрен):    {target_counts[1]:,} ({target_pct[1]:.2f}%)")
@@ -168,11 +169,9 @@ ratio = target_counts[0] / target_counts[1]
 print(f"   Соотношение: {ratio:.2f}:1")
 
 # Сохраняем
-target_df = pd.DataFrame({
-    'Class': [0, 1],
-    'Count': target_counts.values,
-    'Percentage': target_pct.values
-})
-target_file = os.path.join(RESULTS_PATH, '01_target_distribution.csv')
+target_df = pd.DataFrame(
+    {"Class": [0, 1], "Count": target_counts.values, "Percentage": target_pct.values}
+)
+target_file = os.path.join(RESULTS_PATH, "01_target_distribution.csv")
 target_df.to_csv(target_file, index=False)
 print(f"\n✅ Распределение таргета сохранено: {target_file}")

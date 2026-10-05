@@ -3,12 +3,13 @@
 Логирует метрики модели и инфраструктурные показатели.
 """
 
-import mlflow
-import time
-import psutil
 import os
 import sys
+import time
 from pathlib import Path
+
+import mlflow
+import psutil
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
@@ -18,35 +19,35 @@ sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 PROGRESS_METRICS = [
     {"step": "Step1_LogisticRegression", "roc_auc": 0.87},
-    {"step": "Step3_RF_OneHot",          "roc_auc": 0.92},
-    {"step": "Step3_RF_Ordinal",         "roc_auc": 0.93},
-    {"step": "Step4_after_cleaning",     "roc_auc": 0.935},
-    {"step": "Step5_BoxCox",             "roc_auc": 0.937},
-    {"step": "Step6_LightGBM_baseline",  "roc_auc": 0.9552},
-    {"step": "Step6_LightGBM_Optuna",    "roc_auc": 0.9602},
-    {"step": "Step7_Final_CV",           "roc_auc": 0.9587},
+    {"step": "Step3_RF_OneHot", "roc_auc": 0.92},
+    {"step": "Step3_RF_Ordinal", "roc_auc": 0.93},
+    {"step": "Step4_after_cleaning", "roc_auc": 0.935},
+    {"step": "Step5_BoxCox", "roc_auc": 0.937},
+    {"step": "Step6_LightGBM_baseline", "roc_auc": 0.9552},
+    {"step": "Step6_LightGBM_Optuna", "roc_auc": 0.9602},
+    {"step": "Step7_Final_CV", "roc_auc": 0.9587},
 ]
 
 # Лучшие параметры из Optuna
 BEST_PARAMS = {
-    "n_estimators":      836,
-    "max_depth":         12,
-    "learning_rate":     0.033018,
-    "num_leaves":        23,
+    "n_estimators": 836,
+    "max_depth": 12,
+    "learning_rate": 0.033018,
+    "num_leaves": 23,
     "min_child_samples": 40,
-    "subsample":         0.647898,
-    "colsample_bytree":  0.574083,
-    "reg_alpha":         4.743694,
-    "reg_lambda":        0.408280,
+    "subsample": 0.647898,
+    "colsample_bytree": 0.574083,
+    "reg_alpha": 4.743694,
+    "reg_lambda": 0.408280,
 }
 
 # Финальные метрики модели
 FINAL_METRICS = {
-    "roc_auc":     0.9587,
-    "accuracy":    0.9235,
-    "precision":   0.6887,
-    "recall":      0.8443,
-    "f1_score":    0.7585,
+    "roc_auc": 0.9587,
+    "accuracy": 0.9235,
+    "precision": 0.6887,
+    "recall": 0.8443,
+    "f1_score": 0.7585,
     "specificity": 0.9408,
 }
 
@@ -97,7 +98,7 @@ def main():
     with mlflow.start_run(run_name="final_model_lightgbm"):
         mlflow.log_params(BEST_PARAMS)
         mlflow.log_metrics(FINAL_METRICS)
-        print(f"   Параметры Optuna залогированы")
+        print("   Параметры Optuna залогированы")
         print(f"   ROC-AUC (CV): {FINAL_METRICS['roc_auc']}")
 
     # ========================================================================
