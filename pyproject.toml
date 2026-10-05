@@ -1,0 +1,40 @@
+[project]
+name = "loan-approval-prediction-v2"
+version = "0.1.0"
+description = "Kaggle-style loan approval prediction pipeline (LightGBM)"
+readme = "README.md"
+requires-python = ">=3.11,<3.14"
+dependencies = [
+    "numpy==2.3.5",
+    "pandas==2.3.3",
+    "matplotlib==3.10.7",
+    "scikit-learn==1.7.2",
+    "seaborn==0.12.2",
+    "scipy==1.16.3",
+    "lightgbm==4.6.0",
+    "xgboost>=2.1.4,<3.0.0",
+    "catboost==1.2.8",
+    "optuna==3.3.0",
+    "mlflow==3.12.0",
+    "psutil==7.2.2",
+]
+
+[tool.poetry]
+packages = [{ include = "src" }]
+
+[tool.poetry.group.dev.dependencies]
+pytest = "==9.0.3"
+ruff = "==0.16.10"
+pre-commit = "^4.0.0"
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+ignore = ["E501"]
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
