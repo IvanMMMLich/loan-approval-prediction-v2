@@ -1,0 +1,13 @@
+# VCS
+.git/
+
+# Виртуальные окружения
+.venv/
+.venv-legacy/
+
+# Кэши и служебные файлы
+__pycache__/
+*.pyc
+.ruff_cache/
+.pytest_cache/
+mlflow.db

@@ -26,24 +26,25 @@ BASELINE V1 (ONE-HOT): RANDOM FOREST CLASSIFIER
 - n_jobs=-1
 """
 
-import sys
 from pathlib import Path
 
-# Добавляем корневую директорию проекта в sys.path
-project_root = Path(__file__).parent.parent.parent.parent
-sys.path.insert(0, str(project_root))
-
 import pandas as pd
-import numpy as np
-from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import (
-    roc_auc_score, accuracy_score, precision_score, recall_score, 
-    f1_score, classification_report, confusion_matrix
+    accuracy_score,
+    classification_report,
+    confusion_matrix,
+    f1_score,
+    precision_score,
+    recall_score,
+    roc_auc_score,
 )
+from sklearn.model_selection import train_test_split
 
-# Импорт готовых функций визуализации из utils
 from src.utils.plotting import plot_all_model_visualizations
+
+# Корень проекта для путей к данным и результатам
+project_root = Path(__file__).parent.parent.parent.parent
 
 # ============================================================================
 # НАСТРОЙКИ
@@ -53,11 +54,11 @@ RANDOM_STATE = 42
 TEST_SIZE = 0.2
 
 # Пути
-DATA_PATH = project_root / 'data' / 'raw' / 'train.csv'
-OUTPUT_DIR = project_root / 'results' / 'step3_importance' / 'baseline_v1_onehot'
+DATA_PATH = project_root / "data" / "raw" / "train.csv"
+OUTPUT_DIR = project_root / "results" / "step3_importance" / "baseline_v1_onehot"
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-(OUTPUT_DIR / 'tables').mkdir(exist_ok=True)
-(OUTPUT_DIR / 'figures').mkdir(exist_ok=True)
+(OUTPUT_DIR / "tables").mkdir(exist_ok=True)
+(OUTPUT_DIR / "figures").mkdir(exist_ok=True)
 
 # ============================================================================
 # ЗАГРУЗКА И ПОДГОТОВКА ДАННЫХ
@@ -80,11 +81,16 @@ print()
 print("Применение One-Hot Encoding...")
 
 # Удаляем id и таргет перед кодированием
-X = df.drop(columns=['loan_status', 'id'])
-y = df['loan_status']
+X = df.drop(columns=["loan_status", "id"])
+y = df["loan_status"]
 
 # Определяем категориальные признаки
-categorical_features = ['loan_grade', 'person_home_ownership', 'loan_intent', 'cb_person_default_on_file']
+categorical_features = [
+    "loan_grade",
+    "person_home_ownership",
+    "loan_intent",
+    "cb_person_default_on_file",
+]
 
 print(f"Категориальные признаки: {categorical_features}")
 print()
@@ -109,10 +115,7 @@ print()
 
 print("Train/Validation Split...")
 X_train, X_val, y_train, y_val = train_test_split(
-    X_encoded, y, 
-    test_size=TEST_SIZE, 
-    random_state=RANDOM_STATE, 
-    stratify=y
+    X_encoded, y, test_size=TEST_SIZE, random_state=RANDOM_STATE, stratify=y
 )
 
 print(f"Train: {X_train.shape[0]:,} строк, {X_train.shape[1]} признаков")
@@ -140,9 +143,9 @@ rf_model = RandomForestClassifier(
     max_depth=10,
     min_samples_split=20,
     min_samples_leaf=10,
-    class_weight='balanced',
+    class_weight="balanced",
     random_state=RANDOM_STATE,
-    n_jobs=-1
+    n_jobs=-1,
 )
 
 rf_model.fit(X_train, y_train)
@@ -179,12 +182,12 @@ specificity = tn / (tn + fp)
 
 # Словарь метрик для визуализации
 metrics_dict = {
-    'ROC-AUC': roc_auc,
-    'Accuracy': accuracy,
-    'Precision': precision,
-    'Recall': recall,
-    'F1-Score': f1,
-    'Specificity': specificity
+    "ROC-AUC": roc_auc,
+    "Accuracy": accuracy,
+    "Precision": precision,
+    "Recall": recall,
+    "F1-Score": f1,
+    "Specificity": specificity,
 }
 
 # Classification Report
@@ -195,7 +198,7 @@ print("=" * 80)
 print("РЕЗУЛЬТАТЫ BASELINE V1 (ONE-HOT ENCODING)")
 print("=" * 80)
 print(f"ROC-AUC:      {roc_auc:.4f}")
-print(f"Accuracy:     {accuracy:.4f} ({accuracy*100:.2f}%)")
+print(f"Accuracy:     {accuracy:.4f} ({accuracy * 100:.2f}%)")
 print(f"Precision:    {precision:.4f}")
 print(f"Recall:       {recall:.4f}")
 print(f"F1-Score:     {f1:.4f}")
@@ -214,33 +217,34 @@ print()
 print("Сохранение метрик...")
 
 # Таблица основных метрик
-metrics_df = pd.DataFrame({
-    'Metric': ['ROC-AUC', 'Accuracy', 'Precision', 'Recall', 'F1-Score', 'Specificity'],
-    'Value': [roc_auc, accuracy, precision, recall, f1, specificity]
-})
-metrics_path = OUTPUT_DIR / 'tables' / 'metrics.csv'
+metrics_df = pd.DataFrame(
+    {
+        "Metric": ["ROC-AUC", "Accuracy", "Precision", "Recall", "F1-Score", "Specificity"],
+        "Value": [roc_auc, accuracy, precision, recall, f1, specificity],
+    }
+)
+metrics_path = OUTPUT_DIR / "tables" / "metrics.csv"
 metrics_df.to_csv(metrics_path, index=False)
 print(f"Сохранено: {metrics_path}")
 
 # Classification Report
 class_report_df = pd.DataFrame(class_report).transpose()
-report_path = OUTPUT_DIR / 'tables' / 'classification_report.csv'
+report_path = OUTPUT_DIR / "tables" / "classification_report.csv"
 class_report_df.to_csv(report_path)
 print(f"Сохранено: {report_path}")
 
 # Feature Importance (топ-20, т.к. признаков много)
-feature_importance = pd.DataFrame({
-    'Feature': X_encoded.columns,
-    'Importance': rf_model.feature_importances_
-}).sort_values('Importance', ascending=False)
+feature_importance = pd.DataFrame(
+    {"Feature": X_encoded.columns, "Importance": rf_model.feature_importances_}
+).sort_values("Importance", ascending=False)
 
 # Сохраняем все
-fi_path = OUTPUT_DIR / 'tables' / 'feature_importance.csv'
+fi_path = OUTPUT_DIR / "tables" / "feature_importance.csv"
 feature_importance.to_csv(fi_path, index=False)
 print(f"Сохранено: {fi_path}")
 
 # Топ-20 для удобства
-fi_top20_path = OUTPUT_DIR / 'tables' / 'feature_importance_top20.csv'
+fi_top20_path = OUTPUT_DIR / "tables" / "feature_importance_top20.csv"
 feature_importance.head(20).to_csv(fi_top20_path, index=False)
 print(f"Сохранено (топ-20): {fi_top20_path}")
 
@@ -251,14 +255,14 @@ print(f"Сохранено (топ-20): {fi_top20_path}")
 print()
 print("Создание визуализаций...")
 
-figures_dir = str(OUTPUT_DIR / 'figures')
+figures_dir = str(OUTPUT_DIR / "figures")
 plot_all_model_visualizations(
     y_true=y_val,
     y_pred=y_pred,
     y_pred_proba=y_pred_proba,
     metrics_dict=metrics_dict,
     model_name="Baseline_v1_RF_onehot",
-    save_dir=figures_dir
+    save_dir=figures_dir,
 )
 
 print()

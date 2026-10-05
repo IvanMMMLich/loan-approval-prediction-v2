@@ -24,6 +24,7 @@
 - [Структура проекта](#структура-проекта)
 - [Описание этапов работы](#описание-этапов-работы)
 - [Результаты](#результаты)
+- [Установка через Poetry](#установка-через-poetry)
 - [Как запустить](#как-запустить)
 - [Выводы](#выводы)
 
@@ -555,6 +556,35 @@ loan-approval-prediction-v2/
 | person_home_ownership | 958 | 5.21 |
 | loan_grade | 736 | 4.00 |
 | cb_person_default_on_file | 161 | 0.88 |
+
+---
+
+## Установка через Poetry
+
+Зависимости проекта управляются через Poetry (все версии зафиксированы в `poetry.lock`).
+
+Установка Poetry (один раз):
+
+```bash
+curl -sSL https://install.python-poetry.org | python3 -
+```
+
+Установка окружения проекта:
+
+```bash
+poetry install
+```
+
+Все команды проекта запускаются через `poetry run`, например:
+
+```bash
+poetry run pytest tests/ -v
+poetry run python src/step7_pipeline/pipeline_cv.py
+poetry run pre-commit run --all-files
+```
+
+Подробнее о миграции на Poetry, настройке pre-commit, линтера и о замерах
+«до → после»: [business_ml_task1.md](business_ml_task1.md).
 
 ---
 

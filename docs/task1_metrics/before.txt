@@ -1,0 +1,322 @@
+================================================================================
+ЗАМЕР «ДО» — курс «Бизнес-применение машинного обучения», задание 1
+Проект: loan-approval-prediction-v2
+================================================================================
+
+Дата: Mon Oct  5 20:59:32 MSK 2026
+Ветка: practice/task1
+Коммит: 51a56cde18ddcaa9867eaa080d9a1a8c5ad2e6e5
+  (51a56cd Update README: add AutoML, Docker, CI/CD, monitoring, data drift sections)
+Python: 3.13.2 (.venv/bin/python)
+Ruff: 0.16.10 (~/Library/Python/3.13/bin/ruff, конфиг ruff-before.toml)
+
+
+--------------------------------------------------------------------------------
+ROC-AUC (контрольный прогон src/step7_pipeline/pipeline_cv.py)
+команда: .venv/bin/python src/step7_pipeline/pipeline_cv.py
+--------------------------------------------------------------------------------
+
+   РЕЗУЛЬТАТЫ CV:
+   Метрика               Mean      ± Std
+   -----------------------------------
+   roc_auc             0.9587 ±    0.0033
+   accuracy            0.9235 ±    0.0032
+   precision           0.6887 ±    0.0110
+   recall              0.8443 ±    0.0150
+   f1                  0.7585 ±    0.0097
+
+   Детали по фолдам (ROC-AUC):
+      Fold 1: 0.9537
+      Fold 2: 0.9636
+      Fold 3: 0.9566
+      Fold 4: 0.9600
+      Fold 5: 0.9593
+
+Итог: 5-Fold CV: ROC-AUC = 0.9587 ± 0.0033
+
+Фактические версии ML-стека «до» (.venv/bin/python -m pip freeze, выборка
+прямых зависимостей; полный freeze сохранён в /tmp/freeze_before.txt):
+  catboost==1.2.8
+  lightgbm==4.6.0
+  matplotlib==3.10.7
+  mlflow==3.12.0
+  numpy==2.3.5
+  optuna==3.3.0
+  pandas==2.3.3
+  psutil==7.2.2
+  pytest==9.0.3
+  scikit-learn==1.7.2
+  scipy==1.16.3
+  seaborn==0.12.2
+  xgboost==1.7.6
+
+
+--------------------------------------------------------------------------------
+M1. Строк в файле зависимостей
+--------------------------------------------------------------------------------
+команда: wc -l requirements.txt
+вывод:
+      39 requirements.txt
+
+примечание: файл содержит 40 записей — последняя строка без завершающего
+перевода строки (grep -c '==' requirements.txt даёт 40).
+
+
+--------------------------------------------------------------------------------
+M2. Прямые зависимости
+--------------------------------------------------------------------------------
+Классификация 40 записей requirements.txt.
+Метод: инвентарь импортов src/ и tests/ (grep '^import|from' по *.py)
++ зависимости пакетов (.venv/bin/python -m pip show <pkg> | grep Required-by).
+
+Прямые (импортируются в коде): 13
+  numpy, pandas, matplotlib, scikit-learn, seaborn, scipy, lightgbm,
+  xgboost, catboost, optuna, mlflow, psutil, pytest
+
+Транзитивные (не импортируются, требуются прямыми зависимостями): 25
+  alembic, Mako, MarkupSafe, SQLAlchemy, PyYAML, tenacity (через mlflow/optuna)
+  cmaes, colorlog, tqdm (через optuna)
+  joblib, threadpoolctl (через scikit-learn)
+  contourpy, cycler, fonttools, kiwisolver, pyparsing, pillow, packaging (через matplotlib)
+  python-dateutil, pytz, tzdata, six (через pandas/matplotlib)
+  graphviz, plotly (через catboost)
+
+Неиспользуемые (не импортируются и не требуются прямыми): 1
+  imbalanced-learn
+
+Дубли: 1
+  pytest (строки 37 и 40: 7.4.0 и 9.0.3)
+
+Итого: 13 + 25 + 1 + 1 = 40 записей.
+
+Сырой вывод «Required-by» по всем 39 уникальным записям:
+  Mako | alembic
+  MarkupSafe | Flask, Jinja2, Mako, Werkzeug
+  PyYAML | mlflow-skinny, optuna
+  SQLAlchemy | alembic, mlflow, optuna
+  alembic | mlflow, optuna
+  catboost | (нет Required-by)
+  cmaes | optuna
+  colorlog | optuna
+  contourpy | matplotlib
+  cycler | matplotlib
+  fonttools | matplotlib
+  graphviz | catboost
+  imbalanced-learn | (нет Required-by)
+  joblib | imbalanced-learn, scikit-learn
+  kiwisolver | matplotlib
+  lightgbm | (нет Required-by)
+  matplotlib | catboost, mlflow, seaborn
+  mlflow | (нет Required-by)
+  numpy | catboost, cmaes, contourpy, fastcluster, imbalanced-learn, lightgbm, matplotlib, mlflow, optuna, pandas, scikit-learn, scipy, seaborn, skops, xgboost
+  optuna | (нет Required-by)
+  packaging | gunicorn, matplotlib, mlflow-skinny, mlflow-tracing, optuna, plotly, pytest, skops
+  pandas | catboost, mlflow, seaborn
+  pillow | matplotlib
+  plotly | catboost
+  psutil | (нет Required-by)
+  pyparsing | matplotlib
+  pytest | (нет Required-by)
+  python-dateutil | graphene, matplotlib, pandas
+  pytz | pandas
+  scikit-learn | imbalanced-learn, mlflow, skops
+  scipy | catboost, imbalanced-learn, lightgbm, mlflow, scikit-learn, skops, xgboost
+  seaborn | (нет Required-by)
+  six | catboost, python-dateutil
+  tenacity | plotly
+  threadpoolctl | imbalanced-learn, scikit-learn
+  tqdm | optuna
+  typing_extensions | alembic, edge-tts, fastapi, graphene, mlflow-skinny, opentelemetry-api, opentelemetry-sdk, opentelemetry-semantic-conventions, pydantic, pydantic_core, SQLAlchemy, typing-inspection
+  tzdata | pandas
+  xgboost | (нет Required-by)
+
+примечание: в списке Required-by есть «шум» от посторонних пакетов старого
+окружения (fastapi, edge-tts и др.) — классификация выше учитывает только
+цепочки от 12 прямых зависимостей проекта.
+
+
+--------------------------------------------------------------------------------
+M3. Конфликты и дубли версий
+--------------------------------------------------------------------------------
+команда: awk -F'==' '{print $1}' requirements.txt | sort | uniq -d
+вывод:
+  pytest
+
+
+--------------------------------------------------------------------------------
+M4. Версий, зафиксированных в lock-файле
+--------------------------------------------------------------------------------
+команда: grep -c '==' requirements.txt
+вывод:
+  40
+
+lock-файла (poetry.lock) в проекте нет → зафиксированных Poetry версий: 0.
+
+
+--------------------------------------------------------------------------------
+M5. Всего замечаний линтера
+--------------------------------------------------------------------------------
+команда: ruff check . --config ruff-before.toml --statistics
+вывод:
+  166  F541   [*] f-string-missing-placeholders
+   59  I001   [*] unsorted-imports
+   52  F401   [*] unused-import
+   41  E402   [ ] module-import-not-at-top-of-file
+   20  SIM118 [*] in-dict-keys
+   16  B007   [ ] unused-loop-control-variable
+   16  B905   [ ] zip-without-explicit-strict
+   13  UP007  [*] non-pep604-annotation-union
+    5  UP045  [*] non-pep604-annotation-optional
+    3  UP006  [*] non-pep585-annotation
+    2  UP035  [ ] deprecated-import
+    2  SIM108 [ ] if-else-block-instead-of-if-exp
+    2  F841   [ ] unused-variable
+    1  SIM102 [ ] collapsible-if
+  Found 398 errors.
+  [*] 318 fixable with the `--fix` option (36 hidden fixes can be enabled
+      with the `--unsafe-fixes` option).
+
+итог: 398 замечаний.
+
+
+--------------------------------------------------------------------------------
+M6. Неиспользуемых импортов (F401)
+--------------------------------------------------------------------------------
+команда: ruff check . --config ruff-before.toml --select F401 --statistics
+вывод:
+  52  F401  [*] unused-import
+  Found 52 errors.
+итог: 52
+
+
+--------------------------------------------------------------------------------
+M7. Неотсортированных блоков импортов (I001)
+--------------------------------------------------------------------------------
+команда: ruff check . --config ruff-before.toml --select I001 --statistics
+вывод:
+  59  I001  [*] unsorted-imports
+  Found 59 errors.
+итог: 59
+
+
+--------------------------------------------------------------------------------
+M8. f-строк без подстановок (F541)
+--------------------------------------------------------------------------------
+команда: ruff check . --config ruff-before.toml --select F541 --statistics
+вывод:
+  166  F541  [*] f-string-missing-placeholders
+  Found 166 errors.
+итог: 166
+
+
+--------------------------------------------------------------------------------
+M9. Неотформатированных файлов
+--------------------------------------------------------------------------------
+команда: ruff format --check . --config ruff-before.toml
+вывод:
+  51 files would be reformatted, 1 file already formatted
+итог: 51
+
+
+--------------------------------------------------------------------------------
+M10. Автопроверок pre-commit
+--------------------------------------------------------------------------------
+файла .pre-commit-config.yaml в проекте нет → 0 автопроверок.
+
+
+--------------------------------------------------------------------------------
+M11. Файлов с sys.path
+--------------------------------------------------------------------------------
+команда: grep -rl "sys.path" src tests --include='*.py' | wc -l
+вывод:
+      17
+итог: 17 файлов.
+
+
+--------------------------------------------------------------------------------
+M12. Файлов __init__.py
+--------------------------------------------------------------------------------
+команда: find src -name '__init__.py' | wc -l
+вывод:
+       0
+итог: 0.
+
+
+--------------------------------------------------------------------------------
+M13. Служебных файлов в отслеживании git
+--------------------------------------------------------------------------------
+команда: git ls-files | grep -E 'mlflow\.db|mlruns/|\.pytest_cache|\.ruff_cache|\.DS_Store'
+вывод:
+  mlflow.db
+итог: 1.
+
+
+--------------------------------------------------------------------------------
+M14. Строк в .gitignore
+--------------------------------------------------------------------------------
+команда: wc -l .gitignore
+вывод:
+      15 .gitignore
+итог: 15.
+
+
+--------------------------------------------------------------------------------
+M15. Шагов проверки CI
+--------------------------------------------------------------------------------
+Проверочных шагов в .github/workflows/ci.yml: 1 («Run tests»).
+Полный листинг файла:
+  name: CI Pipeline
+
+  on:
+    push:
+      branches: [ main ]
+    pull_request:
+      branches: [ main ]
+
+  jobs:
+    test:
+      runs-on: ubuntu-latest
+
+      steps:
+        - name: Checkout code
+          uses: actions/checkout@v3
+
+        - name: Set up Python
+          uses: actions/setup-python@v4
+          with:
+            python-version: '3.11'
+
+        - name: Install dependencies
+          run: |
+            pip install pytest
+            pip install pandas numpy scikit-learn lightgbm scipy
+
+        - name: Run tests
+          run: |
+            pytest tests/ -v
+
+итог: 1.
+
+
+--------------------------------------------------------------------------------
+M16. Способ установки зависимостей CI
+--------------------------------------------------------------------------------
+Ручная установка фиксированного списка пакетов через pip, БЕЗ версий и БЕЗ
+файла зависимостей:
+  pip install pytest
+  pip install pandas numpy scikit-learn lightgbm scipy
+(requirements.txt в CI не используется; версии ничем не зафиксированы.)
+
+
+--------------------------------------------------------------------------------
+M17. Команд для развёртывания проекта с нуля
+--------------------------------------------------------------------------------
+По README, раздел «Как запустить» (команды установки окружения, без git clone):
+  1) python -m venv .venv
+  2) source .venv/bin/activate
+  3) pip install -r requirements.txt
+итог: 3 команды.
+
+================================================================================
+КОНЕЦ ЗАМЕРА «ДО»
+================================================================================
