@@ -12,18 +12,24 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: '3.13'
+
+      - name: Install Poetry
+        run: pipx install "poetry==2.5.1"
 
       - name: Install dependencies
-        run: |
-          pip install pytest
-          pip install pandas numpy scikit-learn lightgbm scipy
+        run: poetry install --no-interaction --no-ansi
+
+      - name: Ruff check
+        run: poetry run ruff check .
+
+      - name: Ruff format check
+        run: poetry run ruff format --check .
 
       - name: Run tests
-        run: |
-          pytest tests/ -v
+        run: poetry run pytest tests/ -v
