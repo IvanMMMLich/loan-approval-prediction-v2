@@ -14,3 +14,15 @@ venv/
 # OS
 .DS_Store
 Thumbs.db
+
+# MLflow
+mlflow.db
+mlruns/
+
+# Кэши и артефакты сборки
+.ruff_cache/
+.pytest_cache/
+dist/
+
+# Секреты
+.env
