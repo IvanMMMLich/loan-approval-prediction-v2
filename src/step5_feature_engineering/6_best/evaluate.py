@@ -223,7 +223,7 @@ def main():
     Baseline (step4_2, 9 признаков):
        ROC-AUC:  ~0.934
        Accuracy: ~0.927
-       
+
     BEST (10 признаков с изменениями):
        ROC-AUC:  {:.4f}
        Accuracy: {:.4f}

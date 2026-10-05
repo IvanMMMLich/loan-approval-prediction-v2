@@ -292,7 +292,7 @@ def main():
 СРАВНЕНИЕ С BASELINE ДО ОЧИСТКИ:
 
     Нужно сравнить с результатами из step3_importance/baseline_v1/
-    
+
 СЛЕДУЮЩИЙ ШАГ:
 
     step5_feature_engineering — создание новых признаков

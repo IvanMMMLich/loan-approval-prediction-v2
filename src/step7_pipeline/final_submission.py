@@ -327,22 +327,22 @@ def main():
     Предсказания сделаны для {len(X_test):,} примеров
     Визуализация сохранена
     Submission файлы созданы
-    
+
     Train метрики:
        ROC-AUC:  {metrics["ROC-AUC"]:.4f}
        Accuracy: {metrics["Accuracy"]:.4f}
        Recall:   {metrics["Recall"]:.4f}
        F1-Score: {metrics["F1-Score"]:.4f}
-    
+
     Файлы:
        • {RESULTS_DIR / "figures"} (графики)
        • {RESULTS_DIR / "tables"} (таблицы)
        • {submission_proba_path}
        • {submission_class_path}
        • {model_path}
-    
 
-    
+
+
     Ожидаемый ROC-AUC на Kaggle: ~0.955-0.960
     """)
 

@@ -290,7 +290,7 @@ def main():
     ├─────────────────────────────────────────────────────────┤
     │  2. CLASSIFIER (LightGBM с лучшими параметрами)         │
     └─────────────────────────────────────────────────────────┘
-    
+
     Все трансформации внутри Pipeline
     fit() только на train
     Нет data leakage!
@@ -384,11 +384,11 @@ def main():
     Pipeline создан БЕЗ data leakage
     5-Fold CV: ROC-AUC = {cv_results["roc_auc"]["mean"]:.4f} ± {cv_results["roc_auc"]["std"]:.4f}
     Feature Importance проанализирован
-    
+
     Результаты сохранены в: {RESULTS_DIR}
        • cv_results.csv
        • feature_importance.csv
-    
+
     Следующий шаг: python final_submission.py
     """)
 

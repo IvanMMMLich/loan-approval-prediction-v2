@@ -207,21 +207,21 @@ def main():
 
     print(f"""
 СВОДКА:
-    
+
     Удалено признаков:     {len(features_to_drop_train)}
-    
+
     Train до:              {train_df.shape[0]:,} × {train_cols_before}
     Train после:           {train_cleaned.shape[0]:,} × {train_cleaned.shape[1]}
-    
+
     Test до:               {test_df.shape[0]:,} × {test_cols_before}
     Test после:            {test_cleaned.shape[0]:,} × {test_cleaned.shape[1]}
-    
+
 УДАЛЁННЫЕ ПРИЗНАКИ:
-    
+
     1. id                         — технический идентификатор
     2. person_age                  — не значим, мультиколлинеарность
     3. cb_person_cred_hist_length  — не значим, худший по всем метрикам
-    
+
 СЛЕДУЮЩИЙ ШАГ:
 
     step4_2_outliers_capping.py — обработка выбросов (capping)
