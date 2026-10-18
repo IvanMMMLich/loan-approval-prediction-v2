@@ -1,120 +1,158 @@
 """
-Мониторинг ML-пайплайна через MLflow.
-Логирует метрики модели и инфраструктурные показатели.
+Логирование результатов проекта в MLflow.
+
+Принцип: results/ — единственный источник правды (лежит в Git). Этот скрипт
+ничего не вычисляет и не придумывает — он только читает готовые CSV и графики
+из results/ и показывает их в MLflow (метрики, параметры, артефакты).
+
+Один MLflow-запуск на каждый шаг проекта, теги: step=<номер>, source=results.
+Финальная модель (шаг 7) логируется отдельным скриптом log_final_model.py,
+который сам прогоняет кросс-валидацию.
 """
 
-import os
-import time
+import warnings
+from pathlib import Path
 
 import mlflow
-import psutil
+import pandas as pd
 
-# ============================================================================
-# МЕТРИКИ ПРОГРЕССА ПО ЭТАПАМ (из README)
-# ============================================================================
+PROJECT_ROOT = Path(__file__).parent.parent.parent
+RESULTS = PROJECT_ROOT / "results"
 
-PROGRESS_METRICS = [
-    {"step": "Step1_LogisticRegression", "roc_auc": 0.87},
-    {"step": "Step3_RF_OneHot", "roc_auc": 0.92},
-    {"step": "Step3_RF_Ordinal", "roc_auc": 0.93},
-    {"step": "Step4_after_cleaning", "roc_auc": 0.935},
-    {"step": "Step5_BoxCox", "roc_auc": 0.937},
-    {"step": "Step6_LightGBM_baseline", "roc_auc": 0.9552},
-    {"step": "Step6_LightGBM_Optuna", "roc_auc": 0.9602},
-    {"step": "Step7_Final_CV", "roc_auc": 0.9587},
+# Метрики, которые показываем в UI (без счётчиков TP/TN/FP/FN).
+STANDARD_METRICS = ["ROC-AUC", "Accuracy", "Precision", "Recall", "F1-Score", "Specificity"]
+
+
+def log_metric_csv(path, prefix=""):
+    """Читает CSV с метриками и логирует их в MLflow.
+
+    Поддерживаются три формата, которые встречаются в results/:
+    - широкий (одна строка: колонки-метрики);
+    - длинный (колонки Metric, Value);
+    - сравнение (колонка Model + колонки-метрики, по строке на модель).
+    """
+    df = pd.read_csv(path)
+
+    if "Metric" in df.columns and "Value" in df.columns:
+        for _, row in df.iterrows():
+            name = str(row["Metric"])
+            if name in STANDARD_METRICS:
+                mlflow.log_metric(f"{prefix}{name}", float(row["Value"]))
+
+    elif len(df) == 1:
+        for col in df.columns:
+            if col in STANDARD_METRICS:
+                mlflow.log_metric(f"{prefix}{col}", float(df.iloc[0][col]))
+
+    else:
+        for _, row in df.iterrows():
+            model = str(row["Model"]).replace(" ", "_")
+            for col in df.columns:
+                if col in STANDARD_METRICS:
+                    mlflow.log_metric(f"{prefix}{model}_{col}", float(row[col]))
+
+
+def log_param_csv(path):
+    """Читает CSV с одной строкой параметров и логирует их как параметры запуска."""
+    df = pd.read_csv(path)
+    row = df.iloc[0]
+    for col in df.columns:
+        mlflow.log_param(col, row[col])
+
+
+def log_dir(path, base):
+    """Логирует файлы каталога как артефакты, пропуская скрытые файлы (.DS_Store и т.п.)."""
+    path = Path(path)
+    if not path.is_dir():
+        return
+    for p in sorted(path.rglob("*")):
+        if p.is_file() and not any(part.startswith(".") for part in p.parts):
+            sub = str(p.relative_to(path).parent)
+            artifact_path = base if sub == "." else f"{base}/{sub}"
+            mlflow.log_artifact(str(p), artifact_path=artifact_path)
+
+
+# Описание шагов проекта: какие CSV с метриками/параметрами читать и какие
+# каталоги figures/tables прикладывать артефактами. Шаг 7 — отдельным скриптом.
+STEPS = [
+    {
+        "step": "step1",
+        "name": "baseline_logistic_regression",
+        "metric_csvs": ["results/step1_first_look/tables/01_baseline_0_metrics.csv"],
+        "artifacts": ["results/step1_first_look/figures", "results/step1_first_look/tables"],
+    },
+    {
+        "step": "step2",
+        "name": "eda",
+        "metric_csvs": [],  # метрик модели нет, только описательные таблицы и графики
+        "artifacts": [
+            "results/step2_eda/categorical_features",
+            "results/step2_eda/numeric_features",
+        ],
+    },
+    {
+        "step": "step3",
+        "name": "feature_importance_and_baselines",
+        "metric_csvs": [
+            "results/step3_importance/baseline_v1/tables/metrics.csv",
+            "results/step3_importance/baseline_v1_onehot/tables/metrics.csv",
+        ],
+        "artifacts": [
+            "results/step3_importance/baseline_v1",
+            "results/step3_importance/baseline_v1_onehot",
+        ],
+    },
+    {
+        "step": "step4",
+        "name": "after_cleaning",
+        "metric_csvs": ["results/step4_cleaning/baseline_after_cleaning/tables/metrics.csv"],
+        "artifacts": [
+            "results/step4_cleaning/figures",
+            "results/step4_cleaning/tables",
+            "results/step4_cleaning/baseline_after_cleaning",
+        ],
+    },
+    {
+        "step": "step5",
+        "name": "feature_engineering_boxcox",
+        "metric_csvs": ["results/step5_feature_engineering/1_transformations/tables/metrics.csv"],
+        "artifacts": ["results/step5_feature_engineering/1_transformations"],
+    },
+    {
+        "step": "step6",
+        "name": "model_selection_optuna",
+        "metric_csvs": [
+            "results/step6_model_selection/tables/metrics_lightgbm_tuned.csv",
+            "results/step6_model_selection/tables/model_comparison.csv",
+        ],
+        "param_csv": "results/step6_model_selection/tables/best_params_lightgbm.csv",
+        "artifacts": [
+            "results/step6_model_selection/figures",
+            "results/step6_model_selection/tables",
+        ],
+    },
 ]
-
-# Лучшие параметры из Optuna
-BEST_PARAMS = {
-    "n_estimators": 836,
-    "max_depth": 12,
-    "learning_rate": 0.033018,
-    "num_leaves": 23,
-    "min_child_samples": 40,
-    "subsample": 0.647898,
-    "colsample_bytree": 0.574083,
-    "reg_alpha": 4.743694,
-    "reg_lambda": 0.408280,
-}
-
-# Финальные метрики модели
-FINAL_METRICS = {
-    "roc_auc": 0.9587,
-    "accuracy": 0.9235,
-    "precision": 0.6887,
-    "recall": 0.8443,
-    "f1_score": 0.7585,
-    "specificity": 0.9408,
-}
-
-
-def log_infrastructure():
-    """Логирует показатели инфраструктуры."""
-    process = psutil.Process(os.getpid())
-
-    ram_used_mb = process.memory_info().rss / 1024 / 1024
-    ram_total_mb = psutil.virtual_memory().total / 1024 / 1024
-    ram_percent = psutil.virtual_memory().percent
-    cpu_percent = psutil.cpu_percent(interval=1)
-    cpu_count = psutil.cpu_count()
-
-    mlflow.log_metric("ram_used_mb", round(ram_used_mb, 2))
-    mlflow.log_metric("ram_total_mb", round(ram_total_mb, 2))
-    mlflow.log_metric("ram_used_percent", round(ram_percent, 2))
-    mlflow.log_metric("cpu_used_percent", round(cpu_percent, 2))
-    mlflow.log_metric("cpu_count", cpu_count)
-
-    print(f"   RAM использовано: {ram_used_mb:.1f} MB ({ram_percent:.1f}%)")
-    print(f"   RAM всего:        {ram_total_mb:.1f} MB")
-    print(f"   CPU загрузка:     {cpu_percent:.1f}% ({cpu_count} ядер)")
 
 
 def main():
-    print("=" * 60)
-    print("МОНИТОРИНГ ML-ПАЙПЛАЙНА (MLflow)")
-    print("=" * 60)
-
+    mlflow.set_tracking_uri(f"sqlite:///{PROJECT_ROOT / 'mlflow.db'}")
     mlflow.set_experiment("loan-approval-prediction")
 
-    # ========================================================================
-    # 1. ПРОГРЕСС МЕТРИК ПО ЭТАПАМ
-    # ========================================================================
-    print("\n1. Логируем прогресс ROC-AUC по этапам...")
+    for cfg in STEPS:
+        with mlflow.start_run(
+            run_name=cfg["name"], tags={"step": cfg["step"], "source": "results"}
+        ):
+            for csv_path in cfg.get("metric_csvs", []):
+                log_metric_csv(RESULTS.parent / csv_path)
+            if "param_csv" in cfg:
+                log_param_csv(RESULTS.parent / cfg["param_csv"])
+            for art_dir in cfg.get("artifacts", []):
+                log_dir(RESULTS.parent / art_dir, base="artifacts")
 
-    with mlflow.start_run(run_name="model_quality_monitoring"):
-        for i, entry in enumerate(PROGRESS_METRICS):
-            mlflow.log_metric("roc_auc_progress", entry["roc_auc"], step=i)
-            print(f"   {entry['step']}: ROC-AUC = {entry['roc_auc']}")
-
-    # ========================================================================
-    # 2. ФИНАЛЬНАЯ МОДЕЛЬ — ПАРАМЕТРЫ И МЕТРИКИ
-    # ========================================================================
-    print("\n2. Логируем финальную модель...")
-
-    with mlflow.start_run(run_name="final_model_lightgbm"):
-        mlflow.log_params(BEST_PARAMS)
-        mlflow.log_metrics(FINAL_METRICS)
-        print("   Параметры Optuna залогированы")
-        print(f"   ROC-AUC (CV): {FINAL_METRICS['roc_auc']}")
-
-    # ========================================================================
-    # 3. МОНИТОРИНГ ИНФРАСТРУКТУРЫ
-    # ========================================================================
-    print("\n3. Мониторинг инфраструктуры...")
-
-    with mlflow.start_run(run_name="infrastructure_monitoring"):
-        start_time = time.time()
-        log_infrastructure()
-        elapsed = time.time() - start_time
-        mlflow.log_metric("monitoring_time_sec", round(elapsed, 3))
-
-    print("\n" + "=" * 60)
-    print("ГОТОВО!")
-    print("=" * 60)
-    print("\nЗапусти UI командой:")
-    print("   mlflow ui")
-    print("Открой браузер: http://127.0.0.1:5000")
+    print("Готово: шаги 1-6 залогированы в mlflow.db.")
+    print("Шаг 7 (финальная модель + Registry) логируется скриптом log_final_model.py.")
 
 
 if __name__ == "__main__":
+    warnings.filterwarnings("ignore")
     main()
