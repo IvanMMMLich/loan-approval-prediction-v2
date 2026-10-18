@@ -230,7 +230,7 @@ git checkout main                     # переключение на main
 
 # Стандартный цикл разработки
 git add .
-git commit -m "Add Docker, CI/CD, pytest, MLflow monitoring"
+git commit -m "Add Docker, CI/CD, pytest"
 git push origin main
 
 # Просмотр истории
@@ -244,50 +244,11 @@ git status
 
 ## Мониторинг
 
-Мониторинг реализован через **MLflow** и охватывает два аспекта: качество модели и состояние инфраструктуры.
-
-Файл мониторинга: `src/monitoring/mlflow_tracking.py`
-
-### Мониторинг качества модели
-
-Логируется прогресс ROC-AUC по всем этапам разработки — от baseline логистической регрессии до финальной LightGBM модели:
-
-| Этап | ROC-AUC |
-|------|---------|
-| Logistic Regression baseline | 0.87 |
-| RF + Ordinal Encoding | 0.93 |
-| После очистки данных | 0.935 |
-| После Box-Cox | 0.937 |
-| LightGBM baseline | 0.9552 |
-| LightGBM + Optuna | 0.9602 |
-| Финальная CV оценка | 0.9587 |
-
-Также логируются все параметры Optuna и финальные метрики модели (ROC-AUC, Accuracy, Precision, Recall, F1, Specificity).
-
-### Мониторинг инфраструктуры
-
-При каждом запуске логируются системные показатели через библиотеку `psutil`:
-
-- RAM использовано (MB и %)
-- RAM всего (MB)
-- Загрузка CPU (%)
-- Количество ядер CPU
-- Время выполнения мониторинга
-
-### Запуск мониторинга
-
-```bash
-# Запуск скрипта мониторинга
-python src/monitoring/mlflow_tracking.py
-
-# Запуск веб-интерфейса MLflow
-mlflow ui
-
-# Открыть в браузере
-# http://localhost:5000
-```
-
-В MLflow UI доступны три эксперимента: `model_quality_monitoring`, `final_model_lightgbm`, `infrastructure_monitoring`.
+MLflow был опробован для учёта экспериментов. От него отказались в пользу
+файлового подхода: на каждом шаге вызываются утилиты из `src/utils/`,
+которые сохраняют графики и таблицы в `results/stepN/`. Так проще работать,
+всё хранится в Git и видно по ссылке на репозиторий без запуска
+отдельного сервиса.
 
 ---
 
@@ -364,8 +325,6 @@ loan-approval-prediction-v2/
 │   ├── step5_feature_engineering/  # Создание признаков
 │   ├── step6_model_selection/  # Сравнение моделей и Optuna
 │   ├── step7_pipeline/         # Финальный Pipeline и submission
-│   ├── monitoring/
-│   │   └── mlflow_tracking.py  # Мониторинг модели и инфраструктуры
 │   └── utils/                  # Переиспользуемые утилиты
 │       ├── metrics.py          # Метрики классификации
 │       ├── plotting.py         # Визуализация
@@ -618,13 +577,6 @@ python src/step7_pipeline/pipeline_cv.py
 python src/step7_pipeline/final_submission.py
 ```
 
-Запуск мониторинга:
-```bash
-python src/monitoring/mlflow_tracking.py
-mlflow ui
-# открыть http://localhost:5000
-```
-
 Запуск через Docker:
 ```bash
 docker build -t loan-approval-prediction .
@@ -657,7 +609,7 @@ docker run loan-approval-prediction
 
 ### Общие итоги
 
-Проект потребовал значительных усилий. Главный результат — модель с ROC-AUC 0.9756 на train и 0.9587 на кросс-валидации, полноценная инфраструктура автоматизации (Optuna, pytest, Docker, GitHub Actions, MLflow) и опыт системного подхода к машинному обучению.
+Проект потребовал значительных усилий. Главный результат — модель с ROC-AUC 0.9756 на train и 0.9587 на кросс-валидации, полноценная инфраструктура автоматизации (Optuna, pytest, Docker, GitHub Actions) и опыт системного подхода к машинному обучению.
 
 ---
 
