@@ -325,6 +325,7 @@ loan-approval-prediction-v2/
 │   ├── step5_feature_engineering/  # Создание признаков
 │   ├── step6_model_selection/  # Сравнение моделей и Optuna
 │   ├── step7_pipeline/         # Финальный Pipeline и submission
+│   ├── step8_decision_zones/   # Расчёт границ зон решения
 │   └── utils/                  # Переиспользуемые утилиты
 │       ├── metrics.py          # Метрики классификации
 │       ├── plotting.py         # Визуализация
@@ -483,6 +484,15 @@ loan-approval-prediction-v2/
 | F1-Score | 0.7585 | ±0.010 |
 
 Файлы: `src/step7_pipeline/`
+
+### Step 8: Границы зон решения
+
+По out-of-fold вероятностям модели рассчитаны границы трёх зон решения: автоодобрение,
+автоотказ и ручная проверка. Рабочий вариант: допустимая доля плохих среди автоодобренных
+5% и допустимая доля потерянных хороших от всех хороших 5%. Границы: нижняя 0.18,
+верхняя 0.92. Подробности в `Model_BPMN.md` и `results/step8_decision_zones/`.
+
+Файлы: `src/step8_decision_zones/`
 
 ---
 
